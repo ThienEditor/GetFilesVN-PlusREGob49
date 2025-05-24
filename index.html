@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PERMIUM OB49 V2</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: radial-gradient(circle at center, #1b1b4f 0%, #0a0a23 70%);
+            overflow: hidden;
+            font-family: 'Arial', sans-serif;
+        }
+
+        /* Lớp nền thiên hà xoáy */
+        .galaxy-background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+            overflow: hidden;
+        }
+
+        .galaxy-spiral {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
+            animation: rotateGalaxy 60s linear infinite;
+            filter: blur(10px);
+        }
+
+        @keyframes rotateGalaxy {
+            from { transform: translate(-50%, -50%) rotate(0deg); }
+            to { transform: translate(-50%, -50%) rotate(360deg); }
+        }
+
+        /* Hiệu ứng ngôi sao */
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite ease-in-out;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.3; transform: scale(0.8); }
+            50% { opacity: 1; transform: scale(1.2); }
+        }
+
+        .star:nth-child(1) { width: 2px; height: 2px; top: 15%; left: 25%; animation-delay: 0.5s; }
+        .star:nth-child(2) { width: 1px; height: 1px; top: 35%; left: 65%; animation-delay: 1s; }
+        .star:nth-child(3) { width: 3px; height: 3px; top: 55%; left: 85%; animation-delay: 1.5s; }
+        .star:nth-child(4) { width: 2px; height: 2px; top: 75%; left: 35%; animation-delay: 2s; }
+        .star:nth-child(5) { width: 1px; height: 1px; top: 25%; left: 45%; animation-delay: 2.5s; }
+
+        /* Nút Galaxy */
+        .galaxy-button {
+            position: relative;
+            padding: 15px 30px;
+            font-size: 18px;
+            color: #fff;
+            background: linear-gradient(45deg, rgba(100, 65, 165, 0.7), rgba(65, 182, 230, 0.7), rgba(255, 105, 180, 0.7));
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            z-index: 10;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin: 10px;
+            opacity: 0.85; /* Độ mờ nhẹ */
+        }
+
+        .galaxy-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(65, 182, 230, 0.5), 0 0 40px rgba(255, 105, 180, 0.3);
+            opacity: 1; /* Tăng độ rõ khi hover */
+        }
+
+        .galaxy-button:active {
+            transform: scale(0.95);
+        }
+
+        .galaxy-button:disabled {
+            background: linear-gradient(45deg, rgba(100, 100, 100, 0.7), rgba(150, 150, 150, 0.7));
+            cursor: not-allowed;
+            box-shadow: none;
+            opacity: 0.6;
+        }
+
+        /* Hiệu ứng particle */
+        .particle {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: particleBurst 1s ease-out forwards;
+        }
+
+        @keyframes particleBurst {
+            0% { transform: translate(-50%, -50%) translate(0, 0); opacity: 1; }
+            100% { transform: translate(-50%, -50%) translate(var(--x), var(--y)); opacity: 0; }
+        }
+
+        .galaxy-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: 0.5s;
+        }
+
+        .galaxy-button:hover::before {
+            left: 100%;
+        }
+
+        /* Tiêu đề */
+        .title {
+            position: absolute;
+            top: 15%;
+            color: #fff;
+            font-size: 48px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+            animation: glow 2s ease-in-out infinite;
+            z-index: 5;
+        }
+
+        @keyframes glow {
+            0%, 100% { text-shadow: 0 0 10px rgba(255, 255, 255, 0.8); }
+            50% { text-shadow: 0 0 20px rgba(255, 255, 255, 1), 0 0 30px rgba(65, 182, 230, 0.8); }
+        }
+
+        /* Ô nhập mật khẩu */
+        .password-container {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 15;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 0 20px rgba(65, 182, 230, 0.5);
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(-60%); opacity: 0; }
+            to { transform: translateY(-50%); opacity: 1; }
+        }
+
+        .password-input {
+            padding: 10px;
+            font-size: 16px;
+            border: none;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            width: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .password-input:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(65, 182, 230, 0.8);
+        }
+
+        /* Bộ đếm ngược */
+        #countdown {
+            color: #fff;
+            font-size: 16px;
+            margin-bottom: 10px;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+        }
+
+        /* Thông báo mật khẩu */
+        #password-message, #countdown-message {
+            color: #fff;
+            font-size: 16px;
+            margin-top: 10px;
+            text-align: center;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+        }
+
+        /* Căn chỉnh nút */
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body>
+    <div class="galaxy-background">
+        <div class="galaxy-spiral"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+    </div>
+    <h1 class="title">AIMBOT V2</h1>
+    <div class="button-container">
+        <button class="galaxy-button" onclick="checkPasswordInput()">Lấy File</button>
+        <button class="galaxy-button" id="getPasswordButton" onclick="startCountdown()">Lấy Key</button>
+    </div>
+    <div class="password-container" id="passwordContainer">
+        <input type="password" class="password-input" id="passwordInput" placeholder="Nhập Key">
+        <button class="galaxy-button" id="submitButton" onclick="checkPassword()">Xác Nhận</button>
+        <div id="password-message"></div>
+    </div>
+    <div class="password-container" id="countdownContainer">
+        <div id="countdown">Thời gian còn lại: 30s</div>
+        <div id="countdown-message"></div>
+    </div>
+
+    <script>
+        // Tạo ngôi sao ngẫu nhiên
+        function createStar() {
+            const star = document.createElement('div');
+            star.classList.add('star');
+            star.style.width = `${Math.random() * 3 + 1}px`;
+            star.style.height = star.style.width;
+            star.style.top = `${Math.random() * 100}%`;
+            star.style.left = `${Math.random() * 100}%`;
+            star.style.animationDelay = `${Math.random() * 3}s`;
+            document.querySelector('.galaxy-background').appendChild(star);
+        }
+
+        for (let i = 0; i < 50; i++) {
+            createStar();
+        }
+
+        // Hiệu ứng particle cho tất cả nút
+        document.querySelectorAll('.galaxy-button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                if (!button.disabled) {
+                    for (let i = 0; i < 20; i++) {
+                        const particle = document.createElement('div');
+                        particle.classList.add('particle');
+                        const angle = Math.random() * Math.PI * 2;
+                        const distance = Math.random() * 100 + 50;
+                        particle.style.left = `${e.offsetX}px`;
+                        particle.style.top = `${e.offsetY}px`;
+                        particle.style.transform = `translate(-50%, -50%)`;
+                        particle.style.setProperty('--x', `${Math.cos(angle) * distance}px`);
+                        particle.style.setProperty('--y', `${Math.sin(angle) * distance}px`);
+                        button.appendChild(particle);
+                        setTimeout(() => particle.remove(), 1000);
+                    }
+                }
+            });
+        });
+
+        // Cập nhật keyframes cho particle
+        const styleSheet = document.styleSheets[0];
+        styleSheet.insertRule(`
+            @keyframes particleBurst {
+                0% { transform: translate(-50%, -50%) translate(0, 0); opacity: 1; }
+                100% { transform: translate(-50%, -50%) translate(var(--x), var(--y)); opacity: 0; }
+            }`, styleSheet.cssRules.length);
+
+        // Ô nhập mật khẩu cho "Nhập Mật Khẩu"
+        function checkPasswordInput() {
+            const container = document.getElementById('passwordContainer');
+            const countdownContainer = document.getElementById('countdownContainer');
+            const passwordInput = document.getElementById('passwordInput');
+            const message = document.getElementById('password-message');
+            const submitButton = document.getElementById('submitButton');
+            
+            container.style.display = 'flex';
+            countdownContainer.style.display = 'none';
+            submitButton.setAttribute('onclick', 'checkPassword()');
+            passwordInput.value = '';
+            message.textContent = '';
+        }
+
+        // Kiểm tra mật khẩu để chuyển hướng
+        function checkPassword() {
+            const passwordInput = document.getElementById('passwordInput');
+            const message = document.getElementById('password-message');
+            const password = passwordInput.value;
+
+            if (password === 'KEY_AIMBOT#1028n9889V2') {
+                message.textContent = 'Đúng Key! Đang chuyển hướng...';
+                message.style.color = '#00b7eb';
+                setTimeout(() => {
+                    window.location.href = 'https://www.mediafire.com/file/6awl4gs3f22ig7y/SuperAimV2/file';
+                }, 1000);
+            } else {
+                message.textContent = 'Key sai!';
+                message.style.color = '#ff4040';
+                setTimeout(() => {
+                    document.getElementById('passwordContainer').style.display = 'none';
+                    message.textContent = '';
+                }, 2000);
+            }
+        }
+
+        // Đếm ngược 30s cho "Lấy Mật Khẩu"
+        let countdownInterval;
+        function startCountdown() {
+            const countdownContainer = document.getElementById('countdownContainer');
+            const countdownDisplay = document.getElementById('countdown');
+            const countdownMessage = document.getElementById('countdown-message');
+            const getPasswordButton = document.getElementById('getPasswordButton');
+            
+            countdownContainer.style.display = 'flex';
+            getPasswordButton.disabled = true;
+            getPasswordButton.textContent = 'Đang chờ...';
+            let timeLeft = 30;
+
+            countdownDisplay.textContent = `Vui lòng đợi đếm ngược để chuyển trang lấy key: ${timeLeft}s`;
+            clearInterval(countdownInterval);
+            countdownInterval = setInterval(() => {
+                timeLeft--;
+                countdownDisplay.textContent = `Vui lòng đợi đếm ngược để chuyển trang lấy key: ${timeLeft}s`;
+                if (timeLeft <= 0) {
+                    clearInterval(countdownInterval);
+                    countdownMessage.textContent = 'Hết thời gian! Nhấn để lấy Key.';
+                    countdownMessage.style.color = '#00b7eb';
+                    getPasswordButton.disabled = false;
+                    getPasswordButton.textContent = 'Chuyển đến trang lấy Key';
+                    getPasswordButton.setAttribute('onclick', 'goToPasswordPage()');
+                    setTimeout(() => {
+                        countdownContainer.style.display = 'none';
+                        countdownMessage.textContent = '';
+                    }, 3000);
+                }
+            }, 1000);
+        }
+
+        // Chuyển hướng sang trang lấy mật khẩu
+        function goToPasswordPage() {
+            window.location.href = 'https://sublink.app/collections/cb016bb4-01dd-48ad-965e-c108fa8e5181';
+        }
+    </script>
+</body>
+</html>
